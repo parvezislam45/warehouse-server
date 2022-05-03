@@ -21,16 +21,34 @@ async function run(){
         await client.connect();
         const productCollection = client.db('davidBikeMania').collection('products')
         app.get('/product',async (req,res)=>{
+            console.log('query',req.query)
+            const page = parseInt(req.query.page)
+            const size = parseInt(req.query.size)
             const query = {}
             const cursor = productCollection.find(query)
-            const newProduct =await cursor.toArray()
-            res.send(newProduct);
+            // newProduct =await cursor.toArray()
+            let products;
+            if(page || size){
+                 products =await cursor.skip(page*size).limit(size).toArray()
+            }
+            else{
+                 products =await cursor.toArray() 
+            }
+            
+            res.send(products);
         })
         app.get('/product/:id',async (req,res) =>{
             const id = req.params.id
             const query = {_id: ObjectId(id)}
             const product = await productCollection.findOne(query)
             res.send(product)
+        })
+
+        app.get('/productCount', async (req,res)=>{
+            const query = {}
+            const cursor = productCollection.find(query)
+            const count =await cursor.count()
+            res.send({count})
         })
 
     //    ------------ Post Data------------
@@ -47,6 +65,20 @@ async function run(){
          const result = await productCollection.deleteOne(query);
          res.send(result);
      })
+    //  ---------------Update Data-------------
+    app.put('/user/:id',async(req,res)=>{
+        const id = req.params.id;
+        const updateQuantity = req.body;
+        const filter = {_id: ObjectId(id)};
+        const options ={upsert: true}
+        const updatedDoc = {
+            $set: {
+                quantity: updateQuantity.quantity
+            }
+        };
+        const result = await productCollection.updateOne(filter,updatedDoc,options);
+        res.send(result)
+    })
     }
     finally{
 
