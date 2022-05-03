@@ -73,13 +73,28 @@ async function run(){
         const options ={upsert: true}
         const updatedDoc = {
             $set: {
-                quantity: updateQuantity.quantity
+                quantity: updateQuantity.newQuantity
             }
         };
         const result = await productCollection.updateOne(filter,updatedDoc,options);
         res.send(result)
     })
-    }
+    
+    app.put('/delivery/:id',async(req,res)=>{
+        const id = req.params.id;
+        const updateQuantity = req.body
+        const delevary = updateQuantity.quantity -1
+        const filter = {_id: ObjectId(id)};
+        const options ={upsert: true}
+        const updatedDoc = {
+            $set: {
+                quantity: delevary
+            }
+        };
+        const result = await productCollection.updateOne(filter,updatedDoc,options);
+        res.send(result)
+    })
+}
     finally{
 
     }
