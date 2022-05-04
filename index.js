@@ -20,6 +20,7 @@ async function run(){
         // -----------Get Product---------------
         await client.connect();
         const productCollection = client.db('davidBikeMania').collection('products')
+        const orderCollection = client.db('davidBikeMania').collection('orders')
         app.get('/product',async (req,res)=>{
             console.log('query',req.query)
             const page = parseInt(req.query.page)
@@ -55,6 +56,12 @@ async function run(){
     app.post('/product',async (req,res) =>{
         const newProduct = req.body;
         const result = await productCollection.insertOne(newProduct);
+        res.send(result);
+    })
+    // -------------Order Data -----------------
+    app.post('/order',async (req,res) =>{
+        const order = req.body;
+        const result = await orderCollection.insertOne(order);
         res.send(result);
     })
 
