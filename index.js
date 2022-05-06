@@ -21,23 +21,24 @@ async function run(){
         await client.connect();
         const productCollection = client.db('davidBikeMania').collection('products')
         const orderCollection = client.db('davidBikeMania').collection('orders')
-        app.get('/product',async (req,res)=>{
-            console.log('query',req.query)
-            const page = parseInt(req.query.page)
-            const size = parseInt(req.query.size)
-            const query = {}
-            const cursor = productCollection.find(query)
-            // newProduct =await cursor.toArray()
-            let products;
-            if(page || size){
-                 products =await cursor.skip(page*size).limit(size).toArray()
-            }
-            else{
-                 products =await cursor.toArray() 
-            }
-            
+
+        app.get('/product', async (req, res) => {
+            const query = {};
+            const cursor = productCollection.find(query);
+            const products = await cursor.toArray();
             res.send(products);
-        })
+        });
+
+        // --------load user order---------
+
+        app.get('/order', async (req, res) => {
+            const query = {};
+            const cursor = orderCollection.find(query);
+            const orders = await cursor.toArray();
+            res.send(orders);
+        });
+
+        
         app.get('/product/:id',async (req,res) =>{
             const id = req.params.id
             const query = {_id: ObjectId(id)}
@@ -51,25 +52,16 @@ async function run(){
             const count =await cursor.count()
             res.send({count})
         })
-
-        // --------load user order---------
-
-        app.get('/order', async (req,res)=>{
-            const email = req.query.email;
-            const query = {email: email}
-            const cursor = orderCollection.find(query)
-            const orders =await cursor.toArray()
-            res.send(orders)
-        })
-    
-
     //    ------------ Post Data------------
+    
     app.post('/product',async (req,res) =>{
         const newProduct = req.body;
         const result = await productCollection.insertOne(newProduct);
         res.send(result);
     })
+
     // -------------Order Data -----------------
+    
     app.post('/order',async (req,res) =>{
         const order = req.body;
         const result = await orderCollection.insertOne(order);
@@ -83,7 +75,7 @@ async function run(){
          const result = await productCollection.deleteOne(query);
          res.send(result);
      })
-    //  ---------------Update Data-------------
+    // //  ---------------Update Data-------------
     app.put('/user/:id',async(req,res)=>{
         const id = req.params.id;
         const updateQuantity = req.body;
