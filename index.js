@@ -29,6 +29,8 @@ async function run(){
             res.send(products);
         });
 
+    
+
         // --------load user order---------
 
         app.get('/order', async (req, res) => {
@@ -114,6 +116,9 @@ run().catch(console.dir)
 
 app.get('/',(req,res)=>{
     res.send('Alhamdulliah Your server is Running')
+})
+app.get('/david',(req,res)=>{
+    res.send('david add success')
 })
 
 app.listen(port,()=>{
